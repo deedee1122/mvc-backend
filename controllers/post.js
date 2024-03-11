@@ -6,7 +6,9 @@ module.exports.getAll = function (req, res) {
     .then((posts) => {
       res.status(200).json(posts)
     })
-    .catch()
+    .catch((error) => {
+      res.status(500).json(error)
+    })
 }
 
 module.exports.getOne = function (req, res) {
@@ -16,7 +18,9 @@ module.exports.getOne = function (req, res) {
     .then((post) => {
       res.status(200).json(post)
     })
-    .catch()
+    .catch((error) => {
+      res.status(500).json(error)
+    })
 }
 
 module.exports.createOne = function (req, res) {
