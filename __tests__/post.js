@@ -1,24 +1,24 @@
 const postCtrl = require('../controllers/post.js')
 const { Post } = require('../models/index.js')
-const { describe, expect, test } = require('@jest/globals')
+const { describe, expect, test, beforeEach, afterEach } = require('@jest/globals')
 describe('getOne', () => {
   beforeEach(() => {
-    Post.create({
+    return Post.create({
       title: 'Post me here',
       text: 'Send the request'
     })
   })
 
   afterEach(() => {
-    Post.drop()
+    return Post.sync({ force: true })
   })
-  const req = {
-    params: {
-      id: 1
-    }
-  }
-
   test('should get one post by pk', (done) => {
+    const req = {
+      params: {
+        id: 1
+      }
+    }
+
     const res = {
       status (num) {
         return res
@@ -39,6 +39,19 @@ describe('getOne', () => {
 })
 
 describe('getAll', () => {
+  beforeEach(() => {
+    return Post.bulkCreate([{
+      title: 'Welcome to France',
+      text: 'Okay'
+    }, {
+      title: 'We are here coding',
+      text: 'live'
+    }])
+  })
+
+  afterEach(() => {
+    return Post.sync({ force: true })
+  })
   const req = {
     params: {
       id: 2
@@ -73,6 +86,7 @@ describe('createOne', () => {
       text: ' Welcome'
     }
   }
+
   test('should createOne', (done) => {
     const res = {
       status (id) {
@@ -81,7 +95,6 @@ describe('createOne', () => {
       json: (data) => {
         const instanceOfPost = data instanceof Post
         expect(instanceOfPost).toBe(true)
-
         done()
       }
 
@@ -92,25 +105,76 @@ describe('createOne', () => {
 })
 
 describe('should useOne post', () => {
+  beforeEach(() => {
+    return Post.create({
+      title: 'Germany',
+      text: 'Send Location'
+    })
+  })
+
+  afterEach(() => {
+    return Post.sync({ force: true })
+  })
+
   const req = {
+    body: {
+      title: 'United Kingdom',
+      text: ' England'
+
+    },
     params: {
-      id: 3
+      id: 1
     }
   }
+
   test('should useOne post', (done) => {
     const res = {
       status (id) {
         return res
       },
       json: (data) => {
+        console.log(data)
         const instanceOfPost = data instanceof Post
         expect(instanceOfPost).toBe(true)
+        expect(data.title).toBe('United Kingdom')
+        done()
+      }
+
+    }
+    postCtrl.useOne(req, res)
+  })
+})
+
+describe('should delOne delete post', () => {
+  beforeEach(() => {
+    return Post.create({
+      title: 'Delete one by one',
+      text: 'delete all'
+    })
+  })
+  afterEach(() => {
+    return Post.sync({ force: true })
+  })
+
+  test('should delOne delete post', (done) => {
+    const req = {
+      params: {
+        id: 1
+      }
+    }
+
+    const res = {
+      status (id) {
+        return res
+      },
+      json: (data) => {
+        expect(data).toEqual({ delete: 'message deleted' })
 
         done()
       }
 
     }
 
-    postCtrl.useOne(req, res)
+    postCtrl.delOne(req, res)
   })
 })

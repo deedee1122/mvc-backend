@@ -39,8 +39,8 @@ module.exports.useOne = function (req, res) {
   Post.findByPk(id)
     .then((post) => {
       post.update({ title: req.body.title, text: req.body.text })
-        .then(() => {
-          res.status(200).json({ post: 'Hello world' })
+        .then((data) => {
+          res.status(200).json(data)
         })
         .catch((error) => {
           res.status(500).json(error)
